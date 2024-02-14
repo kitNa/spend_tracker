@@ -9,11 +9,10 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       drawer: const Menu(),
       appBar: AppBar(
-       // leading: Image.asset('images/logo.png'),
+        // leading: Image.asset('images/logo.png'),
         centerTitle: true,
-        title: const Text(
-          'Spend Tracker',
-        ),
+        title: const Text('Spend Tracker',
+            style: TextStyle(color: Colors.orange, fontSize: 30)),
         actions: <Widget>[
           IconButton(
               onPressed: () => print('click'),

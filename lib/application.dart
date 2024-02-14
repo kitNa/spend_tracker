@@ -8,9 +8,11 @@ class Application extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      //home: HomePage(),
-      initialRoute: '/',
-      routes: routes
-    );
+       // title: Text('Spend Tracker'),
+           // style: TextStyle(color: Colors.orange)),
+        theme: ThemeData(primaryColor: Colors.black87),
+        //home: HomePage(),
+        initialRoute: '/',
+        routes: routes);
   }
 }
