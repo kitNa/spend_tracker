@@ -2,20 +2,21 @@ import 'package:flutter/material.dart';
 
 class Menu extends StatelessWidget {
   const Menu({super.key});
+
   widget({required Text child}) {}
 
   @override
   Widget build(BuildContext context) {
     var color = Theme.of(context).primaryColor;
     return SizedBox(
-      width:  150,
-    //return  SingleChildScrollView(
-     // scrollDirection: Axis.vertical,
+      width: 150,
+      //return  SingleChildScrollView(
+      // scrollDirection: Axis.vertical,
       child: Drawer(
           child: Column(
         children: <Widget>[
           Container(
-           // height: 500,
+            // height: 500,
             alignment: Alignment.center,
             child: Text(
               'MENU',
@@ -33,7 +34,7 @@ class Menu extends StatelessWidget {
             title: 'Accounts',
             color: color,
             icon: Icons.account_balance,
-            onTap: () => onNavigation(context, '/accounts'),
+            onTap: () => onNavigation(context,'/accounts'),
           ),
           const Divider(
             height: 20,
@@ -93,12 +94,12 @@ class _MenuItem extends StatelessWidget {
   final IconData icon;
   final String title;
   final Color color;
-  final Function onTap;
+  final void Function() onTap;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-        onTap: onTap(),
+        onTap: onTap,
         child: Opacity(
             opacity: 0.6,
             child: Container(
