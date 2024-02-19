@@ -60,6 +60,16 @@ class Menu extends StatelessWidget {
             height: 20,
             color: Colors.black,
           ),
+          _MenuItem(
+            color: color,
+            title: 'Bar Chart',
+            icon: Icons.bar_chart,
+            onTap: () => onNavigation(context, '/bar_chart'),
+          ),
+          const Divider(
+            height: 20,
+            color: Colors.black,
+          ),
           //  ListTile(
           //    title: const Text('Accounts'),
           //      onTap: () => Navigator.of(context).pushNamed('/accounts'),
