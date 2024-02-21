@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:spend_tracker/pages/icons/icons_page.dart';
 
+import '../icons/icon_holder.dart';
+
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
 
@@ -31,23 +33,13 @@ class _AccountPageState extends State<AccountPage> {
           padding: const EdgeInsets.all(10.0),
           child: Column(
             children: <Widget>[
-              InkWell(
-                onTap: () => _pickAvatar(),
-                child: Container(
-                  height: 100,
-                  width: 100,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      width: 2,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  child: Icon(
-                    _newIcon,
-                    size: 60,
-                    color: Colors.orangeAccent,
-                  ),
-                ),
+              IconHolder(
+                newIcon: _newIcon,
+                onIconChange: (IconData iconData) {
+                  setState(() {
+                    _newIcon = iconData;
+                  });
+                },
               ),
               //Существует два виджета, которые позволяют захватывать текстовый
               // ввод: Text Field и TextFormField. Оба наследуются от
@@ -83,20 +75,6 @@ class _AccountPageState extends State<AccountPage> {
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
     Navigator.of(context).pop();
-  }
-
-  void _pickAvatar() async {
-    var iconData = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const IconsPage(),
-      ),
-    );
-    setState(() {
-      if (iconData != null) {
-        _newIcon = iconData;
-      }
-    });
   }
 
   String? _nameValidator(var value) {
