@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:spend_tracker/pages/icons/icons_page.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -10,6 +11,7 @@ class AccountPage extends StatefulWidget {
 class _AccountPageState extends State<AccountPage> {
   Map<String, dynamic> _data = Map<String, dynamic>();
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  IconData _newIcon = Icons.add;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,13 +34,30 @@ class _AccountPageState extends State<AccountPage> {
           padding: const EdgeInsets.all(10.0),
           child: Column(
             children: <Widget> [
-              Container(
-                height: 100,
-                width: 100,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    width:2,
-                    color: Colors.black87,
+              InkWell(
+                onTap: () async {
+                  var iconData = await Navigator.push(context,
+                  MaterialPageRoute(
+                      builder: (context) => IconsPage(),
+                  ),
+                  );
+                  setState(() {
+                    _newIcon == _newIcon ?? Icons.add;
+                  });
+                },
+                child: Container(
+                  height: 100,
+                  width: 100,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      width:2,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.add,
+                    size: 60,
+                    color: Colors.orangeAccent,
                   ),
                 ),
               ),
