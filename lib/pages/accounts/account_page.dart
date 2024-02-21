@@ -9,9 +9,10 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
-  Map<String, dynamic> _data = Map<String, dynamic>();
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final Map<String, dynamic> _data = <String, dynamic>{};
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   IconData _newIcon = Icons.add;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,11 +21,7 @@ class _AccountPageState extends State<AccountPage> {
         title: const Text('Account'),
         actions: <Widget>[
           IconButton(
-              onPressed: (){
-                if(!_formKey.currentState!.validate())return;
-                _formKey.currentState!.save();
-                Navigator.of(context).pop();
-              },
+              onPressed: () => _saveNewAccountInfo(),
               icon: const Icon(Icons.save))
         ],
       ),
@@ -33,29 +30,20 @@ class _AccountPageState extends State<AccountPage> {
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(
-            children: <Widget> [
+            children: <Widget>[
               InkWell(
-                onTap: () async {
-                  var iconData = await Navigator.push(context,
-                  MaterialPageRoute(
-                      builder: (context) => IconsPage(),
-                  ),
-                  );
-                  setState(() {
-                    _newIcon == _newIcon ?? Icons.add;
-                  });
-                },
+                onTap: () => _pickAvatar(),
                 child: Container(
                   height: 100,
                   width: 100,
                   decoration: BoxDecoration(
                     border: Border.all(
-                      width:2,
+                      width: 2,
                       color: Colors.black87,
                     ),
                   ),
-                  child: const Icon(
-                    Icons.add,
+                  child: Icon(
+                    _newIcon,
                     size: 60,
                     color: Colors.orangeAccent,
                   ),
@@ -69,25 +57,19 @@ class _AccountPageState extends State<AccountPage> {
               // с виджетом Form упрощают проверку и сохранение данных из
               // нескольких полей одновременно.
               TextFormField(
-                decoration: const InputDecoration (
+                decoration: const InputDecoration(
                   labelText: 'Name',
                 ),
-                validator: (var value){
-                  if(value == null || value.isEmpty) return 'Required';
-                },
+                validator: (var value) => _nameValidator(value),
                 onSaved: (value) => _data['name'] = value,
               ),
               TextFormField(
-                keyboardType:TextInputType.numberWithOptions(
-                    decimal: true
-                ) ,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
                 decoration: const InputDecoration(
                   labelText: 'Balance',
                 ),
-                validator: (var value) {
-                  if(value == null || value.isEmpty) return 'Required';
-                  if(double.tryParse(value) == null) return 'Invalid number';
-                },
+                validator: (var value) => _balanceValidator(value),
                 onSaved: (value) => _data['balance'] = double.parse(value!),
               )
             ],
@@ -95,5 +77,36 @@ class _AccountPageState extends State<AccountPage> {
         ),
       ),
     );
+  }
+
+  void _saveNewAccountInfo() {
+    if (!_formKey.currentState!.validate()) return;
+    _formKey.currentState!.save();
+    Navigator.of(context).pop();
+  }
+
+  void _pickAvatar() async {
+    var iconData = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const IconsPage(),
+      ),
+    );
+    setState(() {
+      if (iconData != null) {
+        _newIcon = iconData;
+      }
+    });
+  }
+
+  String? _nameValidator(var value) {
+    if (value == null || value.isEmpty) return 'Required';
+    return null;
+  }
+
+  String? _balanceValidator(var value) {
+    if (value == null || value.isEmpty) return 'Required';
+    if (double.tryParse(value) == null) return 'Invalid number';
+    return null;
   }
 }
