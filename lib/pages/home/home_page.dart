@@ -1,12 +1,40 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:spend_tracker/pages/home/widgets/custom_text.dart';
 import 'package:spend_tracker/pages/home/widgets/menu.dart';
+import 'package:spend_tracker/pages/index.dart';
 
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: PopupMenuButton(
+        child: const Icon(
+          Icons.add_circle,
+          size: 60,
+          color: Colors.orangeAccent,
+        ),
+        itemBuilder: (BuildContext context) => [
+          const PopupMenuItem(
+            value: 1,
+            child: Text('Deposit'),
+          ),
+          const PopupMenuItem(
+            value: 2,
+            child: Text('Withdraw'),
+          ),
+        ],
+        onSelected: (var value) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ItemPage(
+                isDeposit: value == 1,
+              ),
+            ),
+          );
+        },
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       drawer: const Menu(),
       appBar: AppBar(
         // leading: Image.asset('images/logo.png'),
