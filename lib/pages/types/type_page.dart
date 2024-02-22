@@ -45,9 +45,7 @@ class _TypePageState extends State<TypePage> {
                   )
                 ],
               ),
-            )
-        )
-    );
+            )));
   }
 
   void _saveNewAccountInfo() {
