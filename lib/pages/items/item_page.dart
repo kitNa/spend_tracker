@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:spend_tracker/database/db_provider.dart';
+import 'package:spend_tracker/models/account.dart';
+import 'package:spend_tracker/models/item.dart';
+import 'package:spend_tracker/models/item_type.dart';
 
 class ItemPage extends StatefulWidget {
   final bool isDeposit;
+
   const ItemPage({super.key, required this.isDeposit});
 
   @override
@@ -13,12 +19,35 @@ class ItemPage extends StatefulWidget {
 class _ItemPageState extends State<ItemPage> {
   final Map<String, dynamic> _formData = <String, dynamic>{};
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  List<Account> _accounts = [];
+  List<ItemType> _types = [];
   DateTime _dateTime = DateTime.now();
 
   @override
   void initState() {
     super.initState();
     _formData['isDeposit'] = widget.isDeposit;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadDropdownData();
+  }
+
+  void _loadDropdownData() async {
+    var dbProvider = Provider.of<DBProvider>(context);
+    var accounts = await dbProvider.getAccounts();
+    var types = await dbProvider.getTypes();
+
+    //проверяем, смонтировано ли состояние.
+    if (!mounted) return;
+
+    //устанавливаем состояние
+    setState(() {
+      _accounts = accounts;
+      _types = types;
+    });
   }
 
   @override
@@ -32,6 +61,11 @@ class _ItemPageState extends State<ItemPage> {
                 onPressed: () {
                   if (!_formKey.currentState!.validate()) return;
                   _formKey.currentState?.save();
+                  var dbProvider = Provider.of<DBProvider>(context);
+                  _formData['date'] =
+                      DateFormat('MM/dd/yyyy').format(_dateTime);
+                  var item = Item.fromMap(_formData);
+                  dbProvider.createItem(item);
                   Navigator.of(context).pop();
                 },
                 icon: const Icon(Icons.save))
@@ -101,13 +135,19 @@ class _ItemPageState extends State<ItemPage> {
                   iconEnabledColor: Colors.black87,
                   //dropdownColor: Colors.orangeAccent,
                   //focusColor: Colors.black87,
-                  items: const [
-                    DropdownMenuItem<int>(
-                      value: 1,
-                      child: Text('Credit Card'),
-                    ),
-                    DropdownMenuItem<int>(value: 2, child: Text('Cash'))
-                  ],
+                  items: _accounts
+                      .map((a) => DropdownMenuItem<int>(
+                            value: a.id,
+                            child: Text(a.name),
+                          ))
+                      .toList(),
+                  // const [
+                  //   DropdownMenuItem<int>(
+                  //     value: 1,
+                  //     child: Text('Credit Card'),
+                  //   ),
+                  //   DropdownMenuItem<int>(value: 2, child: Text('Cash'))
+                  // ],
                   validator: (var value) => _descriptionValidator(value),
                   onChanged: (var value) {
                     _formData['accountId'] = value;
@@ -123,13 +163,19 @@ class _ItemPageState extends State<ItemPage> {
                   iconEnabledColor: Colors.black87,
                   //dropdownColor: Colors.orangeAccent,
                   //focusColor: Colors.black87,
-                  items: const [
-                    DropdownMenuItem<int>(
-                      value: 1,
-                      child: Text('products'),
-                    ),
-                    DropdownMenuItem<int>(value: 2, child: Text('medicine'))
-                  ],
+                  items: _types
+                      .map((t) => DropdownMenuItem<int>(
+                            value: t.id,
+                            child: Text(t.name),
+                          ))
+                      .toList(),
+                  // const [
+                  //   DropdownMenuItem<int>(
+                  //     value: 1,
+                  //     child: Text('products'),
+                  //   ),
+                  //   DropdownMenuItem<int>(value: 2, child: Text('medicine'))
+                  // ],
                   validator: (var value) => _descriptionValidator(value),
                   onChanged: (var value) {
                     _formData['purposeId'] = value;
@@ -142,7 +188,7 @@ class _ItemPageState extends State<ItemPage> {
   }
 
   String? _descriptionValidator(var value) {
-    if (value.isEmpty) {
+    if (value == null) {
       return 'Required';
     }
     return null;
@@ -166,3 +212,21 @@ class _ItemPageState extends State<ItemPage> {
     _formData['amount'] = double.parse(value);
   }
 }
+
+//В течение жизненного цикла виджета State последовательно вызываются и задаются
+// несколько методов и свойств. Во-первых, это createState. Фреймворк вызывает
+// этот метод после того, как элемент был добавлен в дерево. Вызывается только
+// один раз. Затем свойству mount присваивается значение true.
+// После этого идет initState. Это инициализирует состояние. Он вызывается
+// только один раз в процессе создания. После этого вызывается
+// didChangeDependencies. Вызывается при изменении зависимости состояния.
+// Вызывается не только при первоначальном создании, но и при последующих
+// обновлениях.
+// Лучше всего, чтобы в этом методе выполнялись сетевые и другие асинхронные
+// вызовы. После вызова этого метода вызывается метод сборки. Он вызывается
+// всякий раз, когда состояние первоначально создается или обновляется.
+// После этого вызывается метод didUpdateWidget. Вызывается при изменении
+// конфигурации виджета. Оттуда у нас есть deactivate, вызываемый, когда виджет
+// удаляется из дерева. Я удивлюсь, если вы когда-нибудь переопределите этот
+// метод. Оттуда вызывается утилизация. Вызывается, когда объект удаляется
+// из дерева навсегда.
