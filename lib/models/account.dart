@@ -1,10 +1,14 @@
 import 'package:flutter/cupertino.dart';
 
+import '../support/icon_helper.dart';
+
 class Account {
-  final int id;
+  final int? id;
   final String name;
   final int codePoint;
   final double balance;
+
+  IconData get iconData => IconHelper.createIconData(codePoint);
 
   Account({required this.id,
     required this.name,
