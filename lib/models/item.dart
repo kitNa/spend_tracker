@@ -1,11 +1,11 @@
 class Item {
-  final int id;
+  final int? id;
   final String description;
   final double amount;
   final bool isDeposit;
   final String date;
   final int accountId;
-  final int typeId;
+  final int? typeId;
 
   Item(
       {required this.id,

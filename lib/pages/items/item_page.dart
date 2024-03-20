@@ -61,7 +61,19 @@ class _ItemPageState extends State<ItemPage> {
                 onPressed: () {
                   if (!_formKey.currentState!.validate()) return;
                   _formKey.currentState?.save();
-                  var dbProvider = Provider.of<DBProvider>(context);
+                  //В обработчиках событий, таких как onPressed , OnTap ,
+                  // onLongPressed и т. д., мы должны использовать
+                  // Provider.of<T>(context,listen:false)
+                  // причина в том, что они не будут прослушивать какие-либо
+                  // изменения в обновлениях, а вместо этого несут
+                  // ответственность за внесение изменений. Тогда как виджеты,
+                  // такие как текст и т. д., отвечают за отображение...
+                  // следовательно, их необходимо обновлять при каждом
+                  // внесенном изменении.... поэтому используйте
+                  // Provider.of<T>(context,listen:true)  //by default is listen:true
+                  // context.read<T>() is same as Provider.of<T>(context, listen: false)
+                  // context.watch<T>() is same as Provider.of<T>(context)```
+                  var dbProvider = context.read<DBProvider>();
                   _formData['date'] =
                       DateFormat('MM/dd/yyyy').format(_dateTime);
                   var item = Item.fromMap(_formData);
