@@ -4,7 +4,7 @@ class Item {
   final double amount;
   final bool isDeposit;
   final String date;
-  final int accountId;
+  final int? accountId;
   final int? typeId;
 
   Item(
