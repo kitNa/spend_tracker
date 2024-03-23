@@ -69,10 +69,12 @@ class DBProvider {
     // в транзакцию. Для этого в SQLite мы используем метод transaction на
     // экземпляре db.
     await db.transaction((txn) async {
-      await txn.rawUpdate('UPDATE Account SET balance = ${balance.toString}' +
+      await txn.rawUpdate(
+          'UPDATE Account SET balance = ${balance.toString()} ' +
           'WHERE id = ${account.id.toString()}');
-      await txn.insert('Item', item.toMap());
     });
+
+    return await db.insert('Item', item.toMap());
   }
 
   Future<List<Item>> getAllItems() async {
@@ -98,7 +100,7 @@ class DBProvider {
 
     await db.transaction((txn) async {
       await txn.rawUpdate(
-        "UPDATE Account SET balance = ${balance.toString()}" +
+        "UPDATE Account SET balance = ${balance.toString()} " +
           "WHERE id = ${account.id.toString()}");
       await txn.delete('Item', where: "id = ?", whereArgs: [item.id]);
     });

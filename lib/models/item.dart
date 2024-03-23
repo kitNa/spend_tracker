@@ -19,6 +19,7 @@ class Item {
   Map<String, dynamic> toMap() => {
         'id': id,
         'description': description,
+        'amount': amount,
         'isDeposit': isDeposit,
         'date': date,
         'accountId': accountId,
@@ -29,8 +30,8 @@ class Item {
       id: map['id'],
       description: map['description'],
       amount: map['amount'],
-      isDeposit:
-          map['isDeposit'] == 1 || map['isDeposit'] == true, // ? true : false,
+      isDeposit: map['isDeposit'] == 1 || map['isDeposit'] == true,
+      // ? true : false,
       date: map['date'],
       accountId: map['accountId'],
       typeId: map['typeId']);
