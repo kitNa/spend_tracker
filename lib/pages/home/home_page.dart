@@ -1,9 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:spend_tracker/pages/home/widgets/custom_text.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:spend_tracker/database/db_provider.dart';
 import 'package:spend_tracker/pages/home/widgets/menu.dart';
 import 'package:spend_tracker/pages/index.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  double _balance = 0;
+
+  @override
+  // Вызывается при изменении зависимости этого объекта State .
+  // Например, если предыдущий вызов build ссылался на InheritedWidget ,
+  // который позже изменился, платформа вызовет этот метод, чтобы
+  // уведомить этот объект об изменении. Этот метод также вызывается сразу
+  // после initState .
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+    // context.read<T>() is same as Provider.of<T>(context, listen: false)
+    // context.watch<T>() is same as Provider.of<T>(context)```
+    // more info in item_page
+    var dbProvider = context.watch<DBProvider>();
+    var balance = await dbProvider.getBalance();
+    setState(() {
+      _balance = balance.total;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,7 +60,7 @@ class HomePage extends StatelessWidget {
                 isDeposit: value == 1,
               ),
             ),
-          );
+          ).then((element) => {setState(() {})});
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -43,7 +72,7 @@ class HomePage extends StatelessWidget {
             style: TextStyle(color: Colors.orange, fontSize: 30)),
         actions: <Widget>[
           IconButton(
-              onPressed: () => print('click'),
+              onPressed: () => didChangeDependencies,
               icon: const Icon(
                 Icons.refresh,
                 color: Colors.orangeAccent,
@@ -101,7 +130,7 @@ class HomePage extends StatelessWidget {
           //       fontSize: 50, color: Colors.black, fontWeight: FontWeight.bold),
           // ),
 
-          _TotalBudget(100000),
+          _TotalBudget(_balance),
 
           Image.network(
             'https://kuznya.biz/wp-content/uploads/2016/06/CHto-takoe-Kuznya.jpg',
@@ -120,10 +149,17 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class _TotalBudget extends StatelessWidget {
-  var amount;
+class _TotalBudget extends StatefulWidget {
+  final double amount;
 
   _TotalBudget(this.amount, {super.key});
+
+  @override
+  State<_TotalBudget> createState() => _TotalBudgetState();
+}
+
+class _TotalBudgetState extends State<_TotalBudget> {
+  final NumberFormat formatter = NumberFormat("#,##0.00", "en_US");
 
   @override
   Widget build(BuildContext context) {
@@ -177,7 +213,7 @@ class _TotalBudget extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: Colors.grey,
-            offset: Offset(6, 6),
+            offset: Offset(3, 3),
           ),
           BoxShadow(
             color: Colors.black87,
@@ -186,9 +222,13 @@ class _TotalBudget extends StatelessWidget {
         ],
       ),
 
-      child: Text('\$ ${amount.toString()}',
-          style: const TextStyle(
-              fontSize: 65, fontWeight: FontWeight.bold, color: Colors.white)),
+      child: Center(
+        child: Text('\$${formatter.format(widget.amount)}',
+            style: const TextStyle(
+                fontSize: 50,
+                fontWeight: FontWeight.bold,
+                color: Colors.white)),
+      ),
     );
   }
 }

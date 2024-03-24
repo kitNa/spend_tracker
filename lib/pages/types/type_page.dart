@@ -18,8 +18,6 @@ class _TypePageState extends State<TypePage> {
   Map<String, dynamic>? _data;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  //IconData _newIcon = Icons.add;
-
   @override
   void initState() {
     super.initState();

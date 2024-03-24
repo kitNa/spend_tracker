@@ -11,9 +11,14 @@ import 'package:intl/intl.dart';
 import 'package:spend_tracker/database/db_provider.dart';
 import 'package:spend_tracker/models/account.dart';
 
-class AccountsPage extends StatelessWidget {
+class AccountsPage extends StatefulWidget {
   const AccountsPage({super.key});
 
+  @override
+  State<AccountsPage> createState() => _AccountsPageState();
+}
+
+class _AccountsPageState extends State<AccountsPage> {
   @override
   Widget build(BuildContext context) {
     var dbProvider = Provider.of<DBProvider>(context);

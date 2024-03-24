@@ -6,6 +6,7 @@ import 'package:spend_tracker/database/db_provider.dart';
 import 'package:spend_tracker/models/account.dart';
 import 'package:spend_tracker/models/item.dart';
 import 'package:spend_tracker/models/item_type.dart';
+import 'package:spend_tracker/pages/home/home_page.dart';
 
 class ItemPage extends StatefulWidget {
   final bool isDeposit;
@@ -78,7 +79,7 @@ class _ItemPageState extends State<ItemPage> {
                       DateFormat('MM/dd/yyyy').format(_dateTime);
                   var item = Item.fromMap(_formData);
                   dbProvider.createItem(item);
-                  Navigator.of(context).pop();
+                  if (context.mounted) Navigator.of(context).pop();
                 },
                 icon: const Icon(Icons.save))
           ],

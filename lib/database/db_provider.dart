@@ -8,6 +8,8 @@ import 'package:spend_tracker/models/item_type.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:spend_tracker/models/account.dart';
 
+import '../models/balance.dart';
+
 //It's better to call AccountRepository, but I follow the example in the lesson
 class DBProvider {
   Database? _database;
@@ -15,6 +17,21 @@ class DBProvider {
   Future<Database> get database async {
     _database ??= await _initialize();
     return _database!;
+  }
+
+  Future<Balance> getBalance() async {
+    final items = await getAllItems();
+    double withdraw = 0;
+    double deposit = 0;
+    items.forEach((item) {
+      if (item.isDeposit) {
+        deposit += item.amount;
+      } else {
+        withdraw += item.amount;
+      }
+    });
+    return Balance(
+        withdraw: withdraw, deposit: deposit, total: deposit - withdraw);
   }
 
   Future<int> createAccount(Account account) async {
@@ -71,7 +88,7 @@ class DBProvider {
     await db.transaction((txn) async {
       await txn.rawUpdate(
           'UPDATE Account SET balance = ${balance.toString()} ' +
-          'WHERE id = ${account.id.toString()}');
+              'WHERE id = ${account.id.toString()}');
     });
 
     return await db.insert('Item', item.toMap());
@@ -92,7 +109,7 @@ class DBProvider {
     var account = Account.fromMap(accounts[0]);
     var balance = account.balance;
 
-    if(item.isDeposit) {
+    if (item.isDeposit) {
       balance -= item.amount;
     } else {
       balance += item.amount;
@@ -100,8 +117,8 @@ class DBProvider {
 
     await db.transaction((txn) async {
       await txn.rawUpdate(
-        "UPDATE Account SET balance = ${balance.toString()} " +
-          "WHERE id = ${account.id.toString()}");
+          "UPDATE Account SET balance = ${balance.toString()} " +
+              "WHERE id = ${account.id.toString()}");
       await txn.delete('Item', where: "id = ?", whereArgs: [item.id]);
     });
   }
