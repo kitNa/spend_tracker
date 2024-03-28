@@ -1,30 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:spend_tracker/pages/icons/icons_page.dart';
-
+import 'package:spend_tracker/database/db_provider.dart';
+import '../../models/account.dart';
+import '../../support/icon_helper.dart';
 import '../icons/icon_holder.dart';
 
 class AccountPage extends StatefulWidget {
-  const AccountPage({super.key});
+  const AccountPage({this.account, super.key});
+
+  final Account? account;
 
   @override
   State<AccountPage> createState() => _AccountPageState();
 }
 
 class _AccountPageState extends State<AccountPage> {
-  final Map<String, dynamic> _data = <String, dynamic>{};
+  Map<String, dynamic>? _data;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  IconData _newIcon = Icons.add;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.account != null) {
+      _data = widget.account!.toMap();
+    } else {
+      _data = <String, dynamic>{};
+      _data!['codePoint'] = Icons.add.codePoint;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    var dbProvider = Provider.of<DBProvider>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.orangeAccent,
         title: const Text('Account'),
         actions: <Widget>[
           IconButton(
-              onPressed: () => _saveNewAccountInfo(),
-              icon: const Icon(Icons.save))
+              onPressed: () => _saveNewAccountInfo(_data!, dbProvider),
+              icon: const Icon(Icons.save)),
         ],
       ),
       body: Form(
@@ -34,10 +50,12 @@ class _AccountPageState extends State<AccountPage> {
           child: Column(
             children: <Widget>[
               IconHolder(
-                newIcon: _newIcon,
+                //codePoint - свойство типа int для идентификации значка в
+                // файле шрифта
+                newIcon: IconHelper.createIconData(_data!['codePoint']),
                 onIconChange: (IconData iconData) {
                   setState(() {
-                    _newIcon = iconData;
+                    _data!['codePoint'] = iconData.codePoint;
                   });
                 },
               ),
@@ -49,20 +67,25 @@ class _AccountPageState extends State<AccountPage> {
               // с виджетом Form упрощают проверку и сохранение данных из
               // нескольких полей одновременно.
               TextFormField(
+                initialValue:
+                    widget.account != null ? widget.account!.name : '',
                 decoration: const InputDecoration(
                   labelText: 'Name',
                 ),
                 validator: (var value) => _nameValidator(value),
-                onSaved: (value) => _data['name'] = value,
+                onSaved: (value) => _data!['name'] = value,
               ),
               TextFormField(
+                initialValue: widget.account != null
+                    ? widget.account!.balance.toString()
+                    : '',
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
                 decoration: const InputDecoration(
                   labelText: 'Balance',
                 ),
                 validator: (var value) => _balanceValidator(value),
-                onSaved: (value) => _data['balance'] = double.parse(value!),
+                onSaved: (value) => _data!['balance'] = double.parse(value!),
               )
             ],
           ),
@@ -71,10 +94,16 @@ class _AccountPageState extends State<AccountPage> {
     );
   }
 
-  void _saveNewAccountInfo() {
+  void _saveNewAccountInfo(Map<String, dynamic> data, var dbProvider) async {
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
-    Navigator.of(context).pop();
+    var account = Account.fromMap(data);
+    if (account.id == null) {
+      await dbProvider.createAccount(account);
+    } else {
+      await dbProvider.updateAccount(account);
+    }
+    if (context.mounted) Navigator.of(context).pop();
   }
 
   String? _nameValidator(var value) {
