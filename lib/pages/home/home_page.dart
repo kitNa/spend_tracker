@@ -18,7 +18,10 @@ class HomePage extends StatefulWidget {
 // додаємо до віджета, який хоче підписатися на події маршруту. RouteObserver —
 // це клас, на який підписуються віджети RouteAware. RouteObserver сповіщає
 // віджети RouteAware про зміни маршруту.
-class _HomePageState extends State<HomePage> with RouteAware {
+class _HomePageState extends State<HomePage>
+//https://api.flutter.dev/flutter/widgets/WidgetsBindingObserver-class.html
+//https://api.flutter.dev/flutter/widgets/RouteAware-class.html
+    with RouteAware, WidgetsBindingObserver {
   double _balance = 0;
 
   @override
@@ -37,17 +40,37 @@ class _HomePageState extends State<HomePage> with RouteAware {
     setState(() {
       _balance = balance.total;
       routeObserver.subscribe(this, ModalRoute.of(context) as PageRoute);
+      WidgetsBinding.instance.addObserver(this);
     });
   }
 
-  // Коли віджет підписаний на routeObserver, ми також повинні його видалити.
-  // Пам'ятайте, що в життєвому циклі віджета State метод dispose викликається,
-  // коли стан видаляється з дерева назавжди.
   @override
   void dispose() {
     super.dispose();
+    // Коли віджет підписаний на routeObserver, ми також повинні його видалити.
+    // Пам'ятайте, що в життєвому циклі віджета State метод dispose викликається,
+    // коли стан видаляється з дерева назавжди.
     routeObserver.unsubscribe(this);
+    // Те саме стосуэться і WidgetsBinding
+    WidgetsBinding.instance.removeObserver(this);
   }
+
+  //Завдяки цьому методу ми можемо знати, коли програма призупинена або неактивна.
+  // Це може допомогти, якщо нам потрібно очистити або зберегти дані. Він також
+  // повідомляє нам, коли додаток відновлюється. Це може бути корисно, якщо ви
+  // хочете вимагати від користувачів повторної автентифікації, коли програма
+  // відновлюється після призупинення роботи у фоновому режимі. Ми хочемо, щоб
+  // програма поверталася на головний екран після відновлення роботи, а не на
+  // місце, де робота була призупинена.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      //заміняємо все що є в стеку домашньою сторінкою
+      Navigator.pushReplacementNamed(context, '/');
+    }
+  }
+
 
   //методи, didPop і didPush, не працюватимуть на домашній сторінці, але
   // працюватимуть на інших сторінках. Це пов'язано з тим, що наша домашня
