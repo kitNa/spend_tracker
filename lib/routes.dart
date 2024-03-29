@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:spend_tracker/pages/bar_chart/bar_chart.dart';
 import 'package:spend_tracker/pages/index.dart';
 
 final routes = {

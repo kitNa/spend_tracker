@@ -18,6 +18,8 @@ class AccountPage extends StatefulWidget {
 class _AccountPageState extends State<AccountPage> {
   Map<String, dynamic>? _data;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  IconData _newIcon = Icons.add;
+  bool _hasChanges = false;
 
   @override
   void initState() {
@@ -45,6 +47,14 @@ class _AccountPageState extends State<AccountPage> {
       ),
       body: Form(
         key: _formKey,
+        canPop: !_hasChanges,
+        onPopInvoked: (bool didPop) {
+          if (didPop) {
+            return;
+          }
+          _showDialog();
+        },
+        onChanged: () => _hasChanges = true,
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(
@@ -54,6 +64,7 @@ class _AccountPageState extends State<AccountPage> {
                 // файле шрифта
                 newIcon: IconHelper.createIconData(_data!['codePoint']),
                 onIconChange: (IconData iconData) {
+                  _hasChanges = true;
                   setState(() {
                     _data!['codePoint'] = iconData.codePoint;
                   });
@@ -68,30 +79,56 @@ class _AccountPageState extends State<AccountPage> {
               // нескольких полей одновременно.
               TextFormField(
                 initialValue:
-                    widget.account != null ? widget.account!.name : '',
+                widget.account != null ? widget.account!.name : '',
                 decoration: const InputDecoration(
                   labelText: 'Name',
                 ),
                 validator: (var value) => _nameValidator(value),
-                onSaved: (value) => _data!['name'] = value,
+                onSaved: (value) => _data?['name'] = value,
               ),
               TextFormField(
                 initialValue: widget.account != null
                     ? widget.account!.balance.toString()
                     : '',
                 keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
+                const TextInputType.numberWithOptions(decimal: true),
                 decoration: const InputDecoration(
                   labelText: 'Balance',
                 ),
                 validator: (var value) => _balanceValidator(value),
-                onSaved: (value) => _data!['balance'] = double.parse(value!),
+                onSaved: (value) => _data?['balance'] = double.parse(value!),
               )
             ],
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _showDialog() async {
+    final bool? shouldDiscard = await showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Are you sure?'),
+            content: const Text('Any unsaved changes will be lost!'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Yes, discard my changes'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pushNamed('/');
+                },
+              ),
+              TextButton(
+                child: const Text('No, continue editing'),
+                onPressed: () {
+                  Navigator.pop(context, false);
+                },
+              ),
+            ],
+          );
+        });
   }
 
   void _saveNewAccountInfo(Map<String, dynamic> data, var dbProvider) async {

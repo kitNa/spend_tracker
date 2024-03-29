@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> {
                 isDeposit: value == 1,
               ),
             ),
-          ).then((element) => {setState(() {})});
+          );
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
             style: TextStyle(color: Colors.orange, fontSize: 30)),
         actions: <Widget>[
           IconButton(
-              onPressed: () => didChangeDependencies,
+              onPressed: () => print('click'),
               icon: const Icon(
                 Icons.refresh,
                 color: Colors.orangeAccent,
@@ -149,16 +149,11 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class _TotalBudget extends StatefulWidget {
+class _TotalBudget extends StatelessWidget {
   final double amount;
 
   _TotalBudget(this.amount, {super.key});
 
-  @override
-  State<_TotalBudget> createState() => _TotalBudgetState();
-}
-
-class _TotalBudgetState extends State<_TotalBudget> {
   final NumberFormat formatter = NumberFormat("#,##0.00", "en_US");
 
   @override
@@ -213,7 +208,7 @@ class _TotalBudgetState extends State<_TotalBudget> {
         boxShadow: [
           BoxShadow(
             color: Colors.grey,
-            offset: Offset(3, 3),
+            offset: Offset(6, 6),
           ),
           BoxShadow(
             color: Colors.black87,
@@ -223,7 +218,7 @@ class _TotalBudgetState extends State<_TotalBudget> {
       ),
 
       child: Center(
-        child: Text('\$${formatter.format(widget.amount)}',
+        child: Text('\$${formatter.format(amount)}',
             style: const TextStyle(
                 fontSize: 50,
                 fontWeight: FontWeight.bold,
