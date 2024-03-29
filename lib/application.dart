@@ -18,14 +18,16 @@ class Application extends StatelessWidget {
     return Provider<DBProvider>(
       //builder:,
       dispose: (_, value) => value.dispose(),
-      create: (BuildContext context)  => DBProvider(),
+      create: (BuildContext context) => DBProvider(),
       child: MaterialApp(
-         // title: Text('Spend Tracker'),
-             // style: TextStyle(color: Colors.orange)),
-          theme: ThemeData(primaryColor: Colors.black87),
-          //home: HomePage(),
-          initialRoute: '/',
-          routes: routes),
+        // title: Text('Spend Tracker'),
+        // style: TextStyle(color: Colors.orange)),
+        theme: ThemeData(primaryColor: Colors.black87),
+        //home: HomePage(),
+        initialRoute: '/',
+        routes: routes,
+        navigatorObservers: [routeObserver],
+      ),
     );
   }
 }

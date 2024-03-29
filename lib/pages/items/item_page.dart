@@ -7,6 +7,7 @@ import 'package:spend_tracker/models/account.dart';
 import 'package:spend_tracker/models/item.dart';
 import 'package:spend_tracker/models/item_type.dart';
 import 'package:spend_tracker/pages/home/home_page.dart';
+import 'package:spend_tracker/routes.dart';
 
 class ItemPage extends StatefulWidget {
   final bool isDeposit;
@@ -17,7 +18,12 @@ class ItemPage extends StatefulWidget {
   State<ItemPage> createState() => _ItemPageState();
 }
 
-class _ItemPageState extends State<ItemPage> {
+// Flutter дозволяє нам підключитися до системи маршрутизації за допомогою
+// кількох класів: RouteObserver і RouteAware. RouteAware — це міксин, який ми
+// додаємо до віджета, який хоче підписатися на події маршруту. RouteObserver —
+// це клас, на який підписуються віджети RouteAware. RouteObserver сповіщає
+// віджети RouteAware про зміни маршруту.
+class _ItemPageState extends State<ItemPage> with RouteAware {
   final Map<String, dynamic> _formData = <String, dynamic>{};
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   List<Account> _accounts = [];
@@ -34,6 +40,29 @@ class _ItemPageState extends State<ItemPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _loadDropdownData();
+    //віджет підписався на routeObserver
+    routeObserver.subscribe(this, ModalRoute.of(context) as PageRoute);
+  }
+
+  // Коли віджет підписаний на routeObserver, ми також повинні його видалити.
+  // Пам'ятайте, що в життєвому циклі віджета State метод dispose викликається,
+  // коли стан видаляється з дерева назавжди.
+  @override
+  void dispose() {
+    super.dispose();
+    routeObserver.unsubscribe(this);
+  }
+
+  //методи, didPop і didPush, не працюватимуть на домашній сторінці, але
+  // працюватимуть на інших сторінках. Це пов'язано з тим, що наша домашня
+  // сторінка є нашим початковим маршрутом. Він не штовхається і не вискакує на
+  // стек з іншої сторінки. Це наша початкова сторінка.
+  void didPop() {
+    print('item_page did pop');
+  }
+
+  void didPush() {
+    print('item_page did push');
   }
 
   void _loadDropdownData() async {
