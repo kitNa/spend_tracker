@@ -8,10 +8,12 @@ class IconHolder extends StatefulWidget {
     super.key,
     required this.newIcon,
     required this.onIconChange,
+    required this.tagId,
   });
 
   final IconData newIcon;
   final OnIconChange onIconChange;
+  final Object tagId;
 
   @override
   State<IconHolder> createState() => _IconHolderState();
@@ -31,10 +33,21 @@ class _IconHolderState extends State<IconHolder> {
             color: Colors.black87,
           ),
         ),
-        child: Icon(
-          widget.newIcon,
-          size: 60,
-          color: Colors.orangeAccent,
+        //The hero refers to the widget that flies between screens.
+        // Create a hero animation using Flutter’s Hero widget.
+        // Fly the hero from one screen to another.
+        // Animate the transformation of a hero’s shape from circular
+        // to rectangular while flying it from one screen to another.
+        // The Hero widget in Flutter implements a style of animation
+        // commonly known as shared element transitions or shared
+        // element animations.
+        child: Hero(
+          tag: widget.tagId,
+          child: Icon(
+            widget.newIcon,
+            size: 60,
+            color: Colors.orangeAccent,
+          ),
         ),
       ),
     );

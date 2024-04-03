@@ -7,6 +7,7 @@ final routes = {
   '/items': (BuildContext context) => const ItemsPage(),
   '/types': (BuildContext context) => const TypesPage(),
   '/bar_chart': (BuildContext context) => const BarChartPage(),
+  '/animation': (BuildContext context) => AnimationPage(),
 };
 
 // Flutter дозволяє нам підключитися до системи маршрутизації за допомогою

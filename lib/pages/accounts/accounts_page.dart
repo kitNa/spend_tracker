@@ -83,7 +83,17 @@ class _AccountsPageState extends State<AccountsPage> {
               itemBuilder: (_, int index) {
                 var account = accounts[index];
                 return ListTile(
-                  leading: Icon(account.iconData),
+                  //The hero refers to the widget that flies between screens.
+                  // Create a hero animation using Flutter’s Hero widget.
+                  // Fly the hero from one screen to another.
+                  // Animate the transformation of a hero’s shape from circular
+                  // to rectangular while flying it from one screen to another.
+                  // The Hero widget in Flutter implements a style of animation
+                  // commonly known as shared element transitions or shared
+                  // element animations.
+                  leading: Hero(
+                      tag: account.id as Object,
+                      child: Icon(account.iconData)),
                   title: Text(account.name),
                   trailing: Text('\$${formatter.format(account.balance)}'),
                   onTap: () {

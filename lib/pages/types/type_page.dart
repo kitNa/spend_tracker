@@ -49,6 +49,7 @@ class _TypePageState extends State<TypePage> {
               child: Column(
                 children: <Widget>[
                   IconHolder(
+                      tagId: widget.type == null? 0: widget.type!.id as Object,
                       newIcon: IconHelper.createIconData(_data!['codePoint']),
                       onIconChange: (IconData iconData) {
                         setState(() {
