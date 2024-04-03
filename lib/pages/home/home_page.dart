@@ -5,6 +5,7 @@ import 'package:spend_tracker/database/db_provider.dart';
 import 'package:spend_tracker/pages/home/widgets/menu.dart';
 import 'package:spend_tracker/pages/index.dart';
 import 'package:spend_tracker/routes.dart';
+import 'dart:math' as math;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -23,10 +24,53 @@ class _HomePageState extends State<
 //https://api.flutter.dev/flutter/widgets/RouteAware-class.html
     with
         RouteAware,
-        WidgetsBindingObserver {
+        WidgetsBindingObserver,
+        SingleTickerProviderStateMixin {
   double _balance = 0;
   double _opacity = 0.2;
   double _fontSize = 10;
+  late Animation<double> _animation;
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 2));
+    _animation = Tween<double>(
+      begin: 0,
+      end: 400,
+    ).animate(_controller)
+      //дві крапки - це каскадна нотація в Dart. Це дозволяє нам робити послідовні
+      //виклики методів на одному і тому ж об'єкті. Можна об'єднати стільки
+      // викликів скільки потрібно.
+      ..addStatusListener((AnimationStatus status) {
+        //addStatusListener дозволяє нам додати зворотний виклик, який очікує на
+        // зміни в анімації. Тут ми перевіряємо, чи анімація завершена, і якщо
+        // так, то змінюємо її на протилежну.
+        if (status == AnimationStatus.dismissed) {
+          //reverse метод змінить анімацію до початкового значення, але
+          // анімуватиме процес протягом вказаного _controller часу.
+          _controller.reverse();
+        } else if (status == AnimationStatus.dismissed) {
+          //Якщо статус закрито, ми переміщуємо анімацію вперед.
+          _controller.forward();
+        }
+      });
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    // Коли віджет підписаний на routeObserver, ми також повинні його видалити.
+    // Пам'ятайте, що в життєвому циклі віджета State метод dispose викликається,
+    // коли стан видаляється з дерева назавжди.
+    routeObserver.unsubscribe(this);
+    // Те саме стосуэться і WidgetsBinding
+    WidgetsBinding.instance.removeObserver(this);
+    _controller.dispose();
+  }
 
   @override
   // Вызывается при изменении зависимости этого объекта State .
@@ -50,17 +94,6 @@ class _HomePageState extends State<
     });
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    // Коли віджет підписаний на routeObserver, ми також повинні його видалити.
-    // Пам'ятайте, що в життєвому циклі віджета State метод dispose викликається,
-    // коли стан видаляється з дерева назавжди.
-    routeObserver.unsubscribe(this);
-    // Те саме стосуэться і WidgetsBinding
-    WidgetsBinding.instance.removeObserver(this);
-  }
-
   //Завдяки цьому методу ми можемо знати, коли програма призупинена або неактивна.
   // Це може допомогти, якщо нам потрібно очистити або зберегти дані. Він також
   // повідомляє нам, коли додаток відновлюється. Це може бути корисно, якщо ви
@@ -79,6 +112,7 @@ class _HomePageState extends State<
 
   //дідPopNext викликається, коли ми повертаємося назад або витягуємо попередній
   //екран зі стека, щоб бути точнішим.
+  @override
   void didPopNext() async {
     var dbProvider = context.watch<DBProvider>();
     var balance = await dbProvider.getBalance();
@@ -87,6 +121,7 @@ class _HomePageState extends State<
   }
 
   //didPushNext викликається, коли ми переходимо на інший екран.
+  @override
   void didPushNext() async {
     var dbProvider = context.watch<DBProvider>();
     var balance = await dbProvider.getBalance();
@@ -205,7 +240,6 @@ class _HomePageState extends State<
           // - AnimationController: керує відтворенням анімації і зберігає
           // конфігурацію та значення анімації.
 
-
           //Віджет AnimatedContainer дозволяє нам анімувати такі властивості,
           // як колір, оформлення, ширина та висота.
 
@@ -213,16 +247,51 @@ class _HomePageState extends State<
           AnimatedOpacity(
               opacity: _opacity,
               duration: const Duration(seconds: 4),
-              child: _TotalBudget(_balance, fontSize: _fontSize,)),
-          AnimatedOpacity(
-            opacity: _opacity,
-            duration: const Duration(seconds: 4),
-            child: Image.network(
-              'https://kuznya.biz/wp-content/uploads/2016/06/CHto-takoe-Kuznya.jpg',
-              height: 300,
-              width: 900,
-            ),
-          ),
+              child: _TotalBudget(
+                _balance,
+                fontSize: _fontSize,
+              )),
+          //    return AnimatedBuilder(
+          //         animation: _animation,
+          //         builder: (_, __) {
+          //           //За допомогою віджета Трансформування ви можете обертати,
+          //           // масштабувати або зміщувати дочірній віджет за допомогою
+          //           // різних конструкторів.
+          //           return Transform.rotate(
+          //             //Тут ми змінюємо ракурс: нашого Зображення. Для нашої формули ми
+          //             // використовуємо постійну числа пі з математичної бібліотеки, яку
+          //             // ми імпортували. Це призведе до того, що наше зображення буде
+          //             // обертатися в міру того, як тривалість буде змінюватися від 0 до
+          //             // 5 секунд.
+          //             angle: _controller.value * 2.0 * math.pi,
+          //               child: Image.asset(
+          //                   'lib/assets/images/image.jpg',
+          //               width: _animation.value,
+          //               height: _animation.value,),
+          //           );
+          //         },
+          //     );
+          AnimatedBuilder(
+            animation: _animation,
+            builder: (_, __) {
+              //За допомогою віджета Трансформування ви можете обертати,
+              // масштабувати або зміщувати дочірній віджет за допомогою
+              // різних конструкторів.
+              return Transform.rotate(
+                //Тут ми змінюємо ракурс: нашого Зображення. Для нашої формули ми
+                // використовуємо постійну числа пі з математичної бібліотеки, яку
+                // ми імпортували. Це призведе до того, що наше зображення буде
+                // обертатися в міру того, як тривалість буде змінюватися від 0 до
+                // 5 секунд.
+                angle: _controller.value * 2.0 * math.pi,
+                child: Image.network(
+                  'https://kuznya.biz/wp-content/uploads/2016/06/CHto-takoe-Kuznya.jpg',
+                  width: _animation.value,
+                  height: _animation.value,
+                ),
+              );
+            },
+          )
 
           // const Text(
           //   'My',
@@ -239,7 +308,7 @@ class _TotalBudget extends StatelessWidget {
   final double amount;
   final double fontSize;
 
-  _TotalBudget(this.amount, {super.key, required this.fontSize});
+  _TotalBudget(this.amount, {required this.fontSize});
 
   final NumberFormat formatter = NumberFormat("#,##0.00", "en_US");
 
@@ -309,11 +378,12 @@ class _TotalBudget extends StatelessWidget {
         //fontSize
         child: AnimatedDefaultTextStyle(
           duration: const Duration(seconds: 3),
-            style: TextStyle(
-                fontSize: fontSize,
-                fontWeight: FontWeight.bold,
-                color: Colors.white),
-          child: Text('\$${formatter.format(amount)}',
+          style: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+              color: Colors.white),
+          child: Text(
+            '\$${formatter.format(amount)}',
           ),
         ),
       ),
