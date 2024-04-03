@@ -70,6 +70,12 @@ class Menu extends StatelessWidget {
             height: 20,
             color: Colors.black,
           ),
+          _MenuItem(
+            color: color,
+            title: 'Animation example',
+            icon: Icons.add_a_photo_outlined,
+            onTap: () => onNavigation(context, '/animation'),
+          ),
           //  ListTile(
           //    title: const Text('Accounts'),
           //      onTap: () => Navigator.of(context).pushNamed('/accounts'),

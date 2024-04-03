@@ -9,3 +9,4 @@ export 'items/item_page.dart';
 export 'types/type_page.dart';
 export 'types/types_page.dart';
 export 'bar_chart/bar_chart.dart';
+export 'animation/animation_page.dart';
