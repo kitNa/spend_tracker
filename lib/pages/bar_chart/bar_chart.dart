@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:spend_tracker/routes.dart';
 
 import '../../database/db_provider.dart';
 import '../../models/balance.dart';
@@ -15,11 +16,36 @@ class BarChartPage extends StatefulWidget {
   State<BarChartPage> createState() => _BarChartPageState();
 }
 
-class _BarChartPageState extends State<BarChartPage> {
+class _BarChartPageState extends State<
+        BarChartPage> //TickerProviderStateMixin Міксин гарантує, що анімація запускається лише тоді,
+// коли віджет видимий. Це також дає віджету можливість отримувати сповіщення
+// про зміну кадру. Отже, наші анімації насправді є просто перемальовуванням
+// наших віджетів кожного разу, коли кадр змінюється. Це відбувається 60 разів
+// на секунду. Flutter рендериться так швидко, що здається, ніби віджет
+// анімований.
+    with
+        TickerProviderStateMixin {
   double _withdrawAmount = 0;
   double _depositAmount = 0;
   double _withdrawBarChartHeight = 0;
   double _depositBarChartHeight = 0;
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 1));
+    _animation = Tween<double>(begin: 0, end: 1).animate(_controller);
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller?.dispose();
+  }
 
   @override
   // Вызывается при изменении зависимости этого объекта State .
@@ -93,6 +119,7 @@ class _BarChartPageState extends State<BarChartPage> {
                   height: _withdrawBarChartHeight,
                   width: 100,
                   text: 'Withdraw',
+                  animation: _animation,
                 ),
                 _BarLine(
                   amount: formatter.format(_depositAmount),
@@ -100,6 +127,7 @@ class _BarChartPageState extends State<BarChartPage> {
                   height: _depositBarChartHeight,
                   width: 100,
                   text: 'Deposit',
+                  animation: _animation,
                 ),
               ],
             ),
@@ -117,13 +145,15 @@ class _BarLine extends StatelessWidget {
       required this.color,
       required this.height,
       required this.width,
-      required this.text});
+      required this.text,
+      required this.animation});
 
   final String amount;
   final Color color;
   final double height;
   final double width;
   final String text;
+  final Animation<double> animation;
 
   @override
   Widget build(BuildContext context) {
@@ -134,10 +164,30 @@ class _BarLine extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Text(amount),
-        Container(
-          height: height,
-          width: width,
-          color: color,
+        //AnimatedBuilder відповідає за створення віджета. Але замість того, щоб
+        // створювати віджет для списку чи ф'ючерса, він створює віджет для
+        // зміни анімації. AnimatedBuilder дозволяє нам анімувати будь-який тип
+        // віджетів.
+        AnimatedBuilder(
+          //BuildContext нам не потрібен і дочірній віджет конструктора нам також
+          // не потрібен. Тому ми використовуємо нижнє і подвійне підкреслення.
+          // Подвійне підкреслення потрібне для запобігання повторенню оголошень
+          // змінних.
+          builder: (_, __) {
+            // Ми хочемо анімувати контейнер так, щоб контейнер малював свою
+            // висоту під час завантаження сторінки. Для цього ми
+            // використовували animation.value. Пам'ятайте, що значення
+            // animation.value має значення від 0 до 1 протягом 2 секунд.
+            // Flutter перемальовує наш віджет зі швидкістю 60 кадрів на секунду,
+            // тому ми можемо використовувати значення animation.value протягом
+            // 120 кадрів і змінювати висоту контейнера.
+            return Container(
+              height: animation.value * height,
+              width: width,
+              color: color,
+            );
+          },
+          animation: animation,
         ),
         Text(text),
       ],

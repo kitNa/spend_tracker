@@ -85,6 +85,17 @@ class _AccountPageState extends State<AccountPage>
     _controller.forward();
   }
 
+  //дідPopNext викликається, коли ми повертаємося назад або витягуємо попередній
+  //екран зі стека, щоб бути точнішим.
+  // void didPopNext() async {
+  //   _controller.forward();
+  // }
+  //
+  // //didPushNext викликається, коли ми переходимо на інший екран.
+  // void didPushNext() async {
+  //   _controller.reset();
+  // }
+
   @override
   void dispose() {
     super.dispose();

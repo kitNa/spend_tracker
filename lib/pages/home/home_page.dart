@@ -77,15 +77,20 @@ class _HomePageState extends State<
     }
   }
 
-  //методи, didPop і didPush, не працюватимуть на домашній сторінці, але
-  // працюватимуть на інших сторінках. Це пов'язано з тим, що наша домашня
-  // сторінка є нашим початковим маршрутом. Він не штовхається і не вискакує на
-  // стек з іншої сторінки. Це наша початкова сторінка.
-  void didPopNext() {
+  //дідPopNext викликається, коли ми повертаємося назад або витягуємо попередній
+  //екран зі стека, щоб бути точнішим.
+  void didPopNext() async {
+    var dbProvider = context.watch<DBProvider>();
+    var balance = await dbProvider.getBalance();
+    _balance = balance.total;
     print('home_page did pop next');
   }
 
-  void didPushNext() {
+  //didPushNext викликається, коли ми переходимо на інший екран.
+  void didPushNext() async {
+    var dbProvider = context.watch<DBProvider>();
+    var balance = await dbProvider.getBalance();
+    _balance = balance.total;
     print('home_page did push next');
   }
 
