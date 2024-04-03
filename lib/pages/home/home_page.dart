@@ -18,11 +18,15 @@ class HomePage extends StatefulWidget {
 // додаємо до віджета, який хоче підписатися на події маршруту. RouteObserver —
 // це клас, на який підписуються віджети RouteAware. RouteObserver сповіщає
 // віджети RouteAware про зміни маршруту.
-class _HomePageState extends State<HomePage>
-//https://api.flutter.dev/flutter/widgets/WidgetsBindingObserver-class.html
+class _HomePageState extends State<
+        HomePage> //https://api.flutter.dev/flutter/widgets/WidgetsBindingObserver-class.html
 //https://api.flutter.dev/flutter/widgets/RouteAware-class.html
-    with RouteAware, WidgetsBindingObserver {
+    with
+        RouteAware,
+        WidgetsBindingObserver {
   double _balance = 0;
+  double _opacity = 0.2;
+  double _fontSize = 10;
 
   @override
   // Вызывается при изменении зависимости этого объекта State .
@@ -41,6 +45,8 @@ class _HomePageState extends State<HomePage>
       _balance = balance.total;
       routeObserver.subscribe(this, ModalRoute.of(context) as PageRoute);
       WidgetsBinding.instance.addObserver(this);
+      _opacity = 1.0;
+      _fontSize = 40;
     });
   }
 
@@ -70,7 +76,6 @@ class _HomePageState extends State<HomePage>
       Navigator.pushReplacementNamed(context, '/');
     }
   }
-
 
   //методи, didPop і didPush, не працюватимуть на домашній сторінці, але
   // працюватимуть на інших сторінках. Це пов'язано з тим, що наша домашня
@@ -181,12 +186,37 @@ class _HomePageState extends State<HomePage>
           //       fontSize: 50, color: Colors.black, fontWeight: FontWeight.bold),
           // ),
 
-          _TotalBudget(_balance),
+          // Існує кілька рівнів анімації з Flutter: неявна, перехідна та явна
+          // анімація. Усі неявні віджети анімації походять від
+          // ImplicitlyAnimatedWidget. Віджети переходів є підкласом
+          // AnimatedWidget. Основна відмінність полягає у тому, що віджети
+          // переходу надають вам більше контролю над анімацією, ніж неявний
+          // віджет, але з більшим контролем приходить складність. Для роботи з
+          // віджетами переходів нам потрібно використовувати пару класів і
+          // міксин. Нам потрібно:
+          // - SingleTickerProviderStateMixin. Він
+          // допомагає переконатися, що анімація запускається лише тоді, коли
+          // віджет видимий.
+          // - AnimationController: керує відтворенням анімації і зберігає
+          // конфігурацію та значення анімації.
 
-          Image.network(
-            'https://kuznya.biz/wp-content/uploads/2016/06/CHto-takoe-Kuznya.jpg',
-            height: 300,
-            width: 900,
+
+          //Віджет AnimatedContainer дозволяє нам анімувати такі властивості,
+          // як колір, оформлення, ширина та висота.
+
+          //AnimatedOpacity анімує появу об'єкта через зміну прозорості
+          AnimatedOpacity(
+              opacity: _opacity,
+              duration: const Duration(seconds: 4),
+              child: _TotalBudget(_balance, fontSize: _fontSize,)),
+          AnimatedOpacity(
+            opacity: _opacity,
+            duration: const Duration(seconds: 4),
+            child: Image.network(
+              'https://kuznya.biz/wp-content/uploads/2016/06/CHto-takoe-Kuznya.jpg',
+              height: 300,
+              width: 900,
+            ),
           ),
 
           // const Text(
@@ -202,8 +232,9 @@ class _HomePageState extends State<HomePage>
 
 class _TotalBudget extends StatelessWidget {
   final double amount;
+  final double fontSize;
 
-  _TotalBudget(this.amount, {super.key});
+  _TotalBudget(this.amount, {super.key, required this.fontSize});
 
   final NumberFormat formatter = NumberFormat("#,##0.00", "en_US");
 
@@ -269,11 +300,17 @@ class _TotalBudget extends StatelessWidget {
       ),
 
       child: Center(
-        child: Text('\$${formatter.format(amount)}',
-            style: const TextStyle(
-                fontSize: 50,
+        //AnimatedDefaultTextStyle дозволяє інімувати розмір через змінну
+        //fontSize
+        child: AnimatedDefaultTextStyle(
+          duration: const Duration(seconds: 3),
+            style: TextStyle(
+                fontSize: fontSize,
                 fontWeight: FontWeight.bold,
-                color: Colors.white)),
+                color: Colors.white),
+          child: Text('\$${formatter.format(amount)}',
+          ),
+        ),
       ),
     );
   }

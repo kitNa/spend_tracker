@@ -59,7 +59,17 @@ class TypesPage extends StatelessWidget {
             itemBuilder: (_, int index) {
               var type = types[index];
               return ListTile(
-                leading: Icon(type.iconData),
+                //The hero refers to the widget that flies between screens.
+                // Create a hero animation using Flutter’s Hero widget.
+                // Fly the hero from one screen to another.
+                // Animate the transformation of a hero’s shape from circular
+                // to rectangular while flying it from one screen to another.
+                // The Hero widget in Flutter implements a style of animation
+                // commonly known as shared element transitions or shared
+                // element animations.
+                leading: Hero(
+                    tag: type.id as Object,
+                    child: Icon(type.iconData)),
                 title: Text(type.name),
                onTap: () {
                   Navigator.push(
