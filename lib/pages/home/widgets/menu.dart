@@ -76,6 +76,12 @@ class Menu extends StatelessWidget {
             icon: Icons.add_a_photo_outlined,
             onTap: () => onNavigation(context, '/animation'),
           ),
+          _MenuItem(
+            color: color,
+            title: 'Logout',
+            icon: Icons.security,
+            onTap: () => onNavigation(context, '/'),
+          ),
           //  ListTile(
           //    title: const Text('Accounts'),
           //      onTap: () => Navigator.of(context).pushNamed('/accounts'),

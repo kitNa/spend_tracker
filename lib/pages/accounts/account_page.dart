@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:spend_tracker/pages/icons/icons_page.dart';
 import 'package:spend_tracker/database/db_provider.dart';
 import '../../models/account.dart';
 import '../../support/icon_helper.dart';
@@ -102,7 +101,7 @@ class _AccountPageState extends State<AccountPage>
     //AnimationController має метод dispose, який потрібно викликати, коли
     // контролер більше не використовується, для очищення ресурсів. Для цього ми
     // перевизначаємо метод dispose віджета State і утилізуємо _controller.
-    _controller?.dispose();
+    _controller.dispose();
   }
 
   @override

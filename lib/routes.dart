@@ -2,12 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:spend_tracker/pages/index.dart';
 
 final routes = {
-  '/': (BuildContext context) => const HomePage(),
-  '/accounts': (BuildContext context) => const AccountsPage(),
-  '/items': (BuildContext context) => const ItemsPage(),
-  '/types': (BuildContext context) => const TypesPage(),
-  '/bar_chart': (BuildContext context) => const BarChartPage(),
-  '/animation': (BuildContext context) => AnimationPage(),
+  '/': (_) => const LoginPage(),
+  '/home': (_) => const HomePage(),
+  '/accounts': (_) => const AccountsPage(),
+  '/items': (_) => const ItemsPage(),
+  '/types': (_) => const TypesPage(),
+  '/bar_chart': (_) => const BarChartPage(),
+  '/animation': (_) => const AnimationPage(),
 };
 
 // Flutter дозволяє нам підключитися до системи маршрутизації за допомогою

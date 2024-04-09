@@ -39,7 +39,7 @@ class _HomePageState extends State<
         AnimationController(vsync: this, duration: const Duration(seconds: 2));
     _animation = Tween<double>(
       begin: 0,
-      end: 400,
+      end: 360,
     ).animate(_controller)
       //дві крапки - це каскадна нотація в Dart. Це дозволяє нам робити послідовні
       //виклики методів на одному і тому ж об'єкті. Можна об'єднати стільки
