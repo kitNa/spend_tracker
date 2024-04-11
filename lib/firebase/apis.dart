@@ -11,7 +11,7 @@ class Apis {
   late String _securityToken;
 
   Future login(String email, String password) async {
-    final String url =
+    const String url =
         'https://spendtracker-9b479-default-rtdb.firebaseio.com/.json';
     var response = await http.post(
       url as Uri,
@@ -32,13 +32,16 @@ class Apis {
   }
 
   Map<String, String> _createHeader() {
-    if(_securityToken != null) {
+    const String url =
+        'https://spendtracker-9b479-default-rtdb.firebaseio.com/.json';
+    //if(_securityToken != null) {
       var header = {
-        "authorasation": "Bearer $_securityToken",
+       // "authorasation": "Bearer $_securityToken",
+        "authorasation": url,
         "Content-Type": "application/json"
       };
       return header;
-    }
+  //  }
     return {"Content-Type": "application/json"};
   }
 }
