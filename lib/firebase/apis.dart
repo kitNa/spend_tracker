@@ -7,15 +7,18 @@ class Apis {
       'https://spendtracker-9b479-default-rtdb.firebaseio.com/';
   static const String key = 'AIzaSyBO7aJibxV4cL8nf7GvIPOOtsd-8b4__gs';
   static const String projectID = 'spendtracker-9b479';
+  static const String url =
+  'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=$key';
+  static const Map<String, String> _jsonHeaders = {
+    'Content-Type': 'application/json',
+  };
 
   late String _securityToken;
 
   Future login(String email, String password) async {
-    const String url =
-        'https://spendtracker-9b479-default-rtdb.firebaseio.com/.json';
     var response = await http.post(
-      url as Uri,
-      headers: _createHeader(),
+      Uri.parse(url),
+      headers: _jsonHeaders,
       body: json.encode({
         'email': email,
         'password': password,
@@ -31,17 +34,12 @@ class Apis {
     _securityToken = LoginResponse.fromMap(map).idToken;
   }
 
-  Map<String, String> _createHeader() {
-    const String url =
-        'https://spendtracker-9b479-default-rtdb.firebaseio.com/.json';
-    //if(_securityToken != null) {
-      var header = {
-       // "authorasation": "Bearer $_securityToken",
-        "authorasation": url,
-        "Content-Type": "application/json"
-      };
-      return header;
-  //  }
-    return {"Content-Type": "application/json"};
-  }
+  // Map<String, String> _createHeader() {
+  //   var header = {
+  //       "authorasation": "Bearer $_securityToken",
+  //       //"authorasation": url,
+  //       "Content-Type": "application/json"
+  //     };
+  //   return header;
+  // }
 }
