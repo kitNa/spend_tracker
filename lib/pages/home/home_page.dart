@@ -83,7 +83,7 @@ class _HomePageState extends State<
     // context.read<T>() is same as Provider.of<T>(context, listen: false)
     // context.watch<T>() is same as Provider.of<T>(context)```
     // more info in item_page
-    var dbProvider = context.watch<DBProvider>();
+    var dbProvider = context.read<DBProvider>();
     var balance = await dbProvider.getBalance();
     setState(() {
       _balance = balance.total;
@@ -114,7 +114,7 @@ class _HomePageState extends State<
   //екран зі стека, щоб бути точнішим.
   @override
   void didPopNext() async {
-    var dbProvider = context.watch<DBProvider>();
+    var dbProvider = context.read<DBProvider>();
     var balance = await dbProvider.getBalance();
     _balance = balance.total;
     print('home_page did pop next');
@@ -123,7 +123,7 @@ class _HomePageState extends State<
   //didPushNext викликається, коли ми переходимо на інший екран.
   @override
   void didPushNext() async {
-    var dbProvider = context.watch<DBProvider>();
+    var dbProvider = context.read<DBProvider>();
     var balance = await dbProvider.getBalance();
     _balance = balance.total;
     print('home_page did push next');

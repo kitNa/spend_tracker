@@ -66,7 +66,7 @@ class _ItemPageState extends State<ItemPage> with RouteAware {
   }
 
   void _loadDropdownData() async {
-    var dbProvider = Provider.of<DBProvider>(context);
+    var dbProvider = Provider.of<DBProvider>(context, listen: false);
     var accounts = await dbProvider.getAccounts();
     var types = await dbProvider.getTypes();
 

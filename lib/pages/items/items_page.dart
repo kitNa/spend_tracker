@@ -10,7 +10,7 @@ class ItemsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var dbProvider = Provider.of<DBProvider>(context);
+    var dbProvider = Provider.of<DBProvider>(context, listen: false);
     return Scaffold(
         appBar: AppBar(
           title: const Text('Items'),

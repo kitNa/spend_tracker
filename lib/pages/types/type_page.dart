@@ -31,7 +31,7 @@ class _TypePageState extends State<TypePage> {
 
   @override
   Widget build(BuildContext context) {
-    var dbProvider = Provider.of<DBProvider>(context);
+    var dbProvider = Provider.of<DBProvider>(context, listen: false);
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.orangeAccent,

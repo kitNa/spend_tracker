@@ -30,7 +30,10 @@ class FirebaseBloc {
 
   //потрібно відкрити потік з властивістю getter.
   get accounts {
-    _accountsBehavSub.stream;
+    _accountsBehavSub.stream.doOnListen(() {
+      Future<void>.delayed(const Duration(seconds: 1))
+          .then((value) => getAccounts());
+    });
   }
 
   Future getAccounts() async {

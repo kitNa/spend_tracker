@@ -38,17 +38,15 @@ class Account {
 
   static List<Account> fromJson(String jsonString) {
     var map = json.decode(jsonString);
-    if (map['documents'] == null) {
-      return [];
-    }
     List<Account> accounts = [];
-    map['documents'].forEach((data) {
+    map.forEach((accountKey, data) {
       var fields = data['fields'];
+      var name = fields['name']['stringValue'];
       accounts.add(Account(
-        urlId: data['name'],
-        codePoint: int.parse(fields['codePoint']['integerValue']),
-        name: fields['name']['stringValue'],
-        balance: double.parse(fields['balance']['doubleValue']).toDouble(),
+        urlId: name,
+        codePoint: fields['codePoint']['integerValue'],
+        name: name,
+        balance: fields['balance']['doubleValue'].toDouble(),
       ));
     });
     return accounts;
