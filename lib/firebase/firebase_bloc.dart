@@ -15,25 +15,22 @@ class FirebaseBloc {
 
   //контролер потоку, який пропустить булеве значення через потік, щоб
   // визначити, чи був вхід успішним.
-  final _securityPubSub = PublishSubject<bool>();
+  final PublishSubject<bool> _securityPubSub = PublishSubject<bool>();
 
   //Різниця між Поведінковим суб'єктом і Суб'єктом публікації для наших цілей
   // полягає в тому, що Суб'єкт Публікації не запам'ятовує останнє значення,
   // а Суб'єкт поведінки запам'ятовує.
-  final _accountsBehavSub = BehaviorSubject<List<Account>?>();
+  final BehaviorSubject<List<Account>?> _accountsBehavSub = BehaviorSubject<List<Account>?>();
 
   //Observable для використання інтерфейсом користувача.
   //Observable<bool>
-  get loginStatus {
+  Stream<bool> get loginStatus {
     return _securityPubSub.stream;
   }
 
   //потрібно відкрити потік з властивістю getter.
-  get accounts {
-    _accountsBehavSub.stream.doOnListen(() {
-      Future<void>.delayed(const Duration(seconds: 1))
-          .then((value) => getAccounts());
-    });
+  Stream<List<Account>?> get accounts {
+    return _accountsBehavSub.stream;
   }
 
   Future getAccounts() async {
