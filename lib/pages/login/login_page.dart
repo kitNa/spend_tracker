@@ -125,7 +125,7 @@ class _LoginForm extends StatelessWidget {
               onSaved: (value) => formData['email'] = value,
             ),
             TextFormField(
-              obscureText: true,
+              obscureText: false,
               decoration: const InputDecoration(
                   labelText: 'Password', icon: Icon(Icons.security)),
               validator: (value) => value!.isEmpty ? 'Required' : null,

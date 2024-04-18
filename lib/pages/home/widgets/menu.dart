@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:spend_tracker/firebase/firebase_bloc.dart';
 
 class Menu extends StatelessWidget {
   const Menu({super.key});
@@ -7,95 +9,101 @@ class Menu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var color = Theme.of(context).primaryColor;
+    var color = Theme
+        .of(context)
+        .primaryColor;
+    var bloc = Provider.of<FirebaseBloc>(context);
     return SizedBox(
       width: 150,
       //return  SingleChildScrollView(
       // scrollDirection: Axis.vertical,
       child: Drawer(
           child: Column(
-        children: <Widget>[
-          Container(
-            // height: 500,
-            alignment: Alignment.center,
-            child: Text(
-              'MENU',
-              style: TextStyle(
-                fontSize: 20,
-                color: color,
+            children: <Widget>[
+              Container(
+                // height: 500,
+                alignment: Alignment.center,
+                child: Text(
+                  'MENU',
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: color,
+                  ),
+                ),
               ),
-            ),
-          ),
-          const Divider(
-            height: 20,
-            color: Colors.black,
-          ),
-          _MenuItem(
-            title: 'Accounts',
-            color: color,
-            icon: Icons.account_balance,
-            onTap: () => onNavigation(context,'/accounts'),
-          ),
-          const Divider(
-            height: 20,
-            color: Colors.black,
-          ),
-          _MenuItem(
-            color: color,
-            title: 'Budget Items',
-            icon: Icons.attach_money,
-            onTap: () => onNavigation(context, '/items'),
-          ),
-          const Divider(
-            height: 20,
-            color: Colors.black,
-          ),
-          _MenuItem(
-            color: color,
-            title: 'Types',
-            icon: Icons.widgets,
-            onTap: () => onNavigation(context, '/types'),
-          ),
-          const Divider(
-            height: 20,
-            color: Colors.black,
-          ),
-          _MenuItem(
-            color: color,
-            title: 'Bar Chart',
-            icon: Icons.bar_chart,
-            onTap: () => onNavigation(context, '/bar_chart'),
-          ),
-          const Divider(
-            height: 20,
-            color: Colors.black,
-          ),
-          _MenuItem(
-            color: color,
-            title: 'Animation example',
-            icon: Icons.add_a_photo_outlined,
-            onTap: () => onNavigation(context, '/animation'),
-          ),
-          _MenuItem(
-            color: color,
-            title: 'Logout',
-            icon: Icons.security,
-            onTap: () => onNavigation(context, '/'),
-          ),
-          //  ListTile(
-          //    title: const Text('Accounts'),
-          //      onTap: () => Navigator.of(context).pushNamed('/accounts'),
-          //  ),
-          //  ListTile(
-          //    title: const Text('Budget Items'),
-          //    onTap: () => Navigator.of(context).pushNamed('/items'),
-          //  ),
-          // ListTile(
-          //   title: const Text('Types'),
-          //   onTap: () => Navigator.of(context).pushNamed('/types'),
-          // ),
-        ],
-      )),
+              const Divider(
+                height: 20,
+                color: Colors.black,
+              ),
+              _MenuItem(
+                  title: 'Accounts',
+                  color: color,
+                  icon: Icons.account_balance,
+                  onTap: () {
+                    bloc.getAccounts();
+                    onNavigation(context,'/accounts');
+                    }
+              ),
+              const Divider(
+                height: 20,
+                color: Colors.black,
+              ),
+              _MenuItem(
+                color: color,
+                title: 'Budget Items',
+                icon: Icons.attach_money,
+                onTap: () => onNavigation(context, '/items'),
+              ),
+              const Divider(
+                height: 20,
+                color: Colors.black,
+              ),
+              _MenuItem(
+                color: color,
+                title: 'Types',
+                icon: Icons.widgets,
+                onTap: () => onNavigation(context, '/types'),
+              ),
+              const Divider(
+                height: 20,
+                color: Colors.black,
+              ),
+              _MenuItem(
+                color: color,
+                title: 'Bar Chart',
+                icon: Icons.bar_chart,
+                onTap: () => onNavigation(context, '/bar_chart'),
+              ),
+              const Divider(
+                height: 20,
+                color: Colors.black,
+              ),
+              _MenuItem(
+                color: color,
+                title: 'Animation example',
+                icon: Icons.add_a_photo_outlined,
+                onTap: () => onNavigation(context, '/animation'),
+              ),
+              _MenuItem(
+                color: color,
+                title: 'Logout',
+                icon: Icons.security,
+                onTap: () => onNavigation(context, '/'),
+              ),
+              //  ListTile(
+              //    title: const Text('Accounts'),
+              //      onTap: () => Navigator.of(context).pushNamed('/accounts'),
+              //  ),
+              //  ListTile(
+              //    title: const Text('Budget Items'),
+              //    onTap: () => Navigator.of(context).pushNamed('/items'),
+              //  ),
+              // ListTile(
+              //   title: const Text('Types'),
+              //   onTap: () => Navigator.of(context).pushNamed('/types'),
+              // ),
+            ],
+          )),
     );
   }
 

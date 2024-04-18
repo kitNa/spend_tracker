@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:spend_tracker/database/db_provider.dart';
+//import 'package:spend_tracker/database/db_provider.dart';
+import 'package:spend_tracker/firebase/firebase_bloc.dart';
 import '../../models/account.dart';
 import '../../support/icon_helper.dart';
 import '../icons/icon_holder.dart';
@@ -34,6 +35,9 @@ class _AccountPageState extends State<AccountPage>
   late Animation<Offset> _animationName;
   late Animation<Offset> _animationBalance;
 
+  //властивість, щоб визначає, чи зберігається обліковий запис
+  bool _isSaving = false;
+
   @override
   void initState() {
     super.initState();
@@ -60,8 +64,8 @@ class _AccountPageState extends State<AccountPage>
     // _animationName =
     //     Tween<Offset>(begin: const Offset(-3, 0), end: const Offset(0, 0))
     //         .animate(_controller);
-    _animationName =
-        Tween<Offset>(begin: const Offset(-3, 0), end: const Offset(0, 0))
+    _animationName = Tween<Offset>(
+            begin: const Offset(-3, 0), end: const Offset(0, 0))
 
         // CurvedAnimation дозволяє нам додавати нелінійні криві або пряму лінію
         // до нашої анімації. Ми передаємо йому наш _controller як параметр
@@ -69,17 +73,17 @@ class _AccountPageState extends State<AccountPage>
         // йому часовий проміжок, коли починати і закінчувати. Інтервал 0.50 та
         // 1.0 вказує анімації починатися, коли контролер знаходиться на 50%
         // тривалості, і закінчувати анімацію в кінці тривалості.
-            .animate(CurvedAnimation(
-                parent: _controller,
-                curve: const Interval(0.50, 1.0, curve: Curves.easeInOutBack)));
+        .animate(CurvedAnimation(
+            parent: _controller,
+            curve: const Interval(0.50, 1.0, curve: Curves.easeInOutBack)));
     _animationBalance =
         Tween<Offset>(begin: const Offset(-3, 0), end: const Offset(0, 0))
             .animate(CurvedAnimation(
                 parent: _controller,
-            //Інтервал від 0.0 до 0.5 вказує анімації почати з початку
-            // тривалості і закінчити до того моменту, коли контролер пройде
-            // 50% від тривалості. Властивість кривої дозволяє нам сказати
-            // анімації, як ми хочемо, щоб діяла наша нелінійна крива.
+                //Інтервал від 0.0 до 0.5 вказує анімації почати з початку
+                // тривалості і закінчити до того моменту, коли контролер пройде
+                // 50% від тривалості. Властивість кривої дозволяє нам сказати
+                // анімації, як ми хочемо, щоб діяла наша нелінійна крива.
                 curve: const Interval(0.0, 0.5, curve: Curves.easeInOutBack)));
     _controller.forward();
   }
@@ -106,85 +110,95 @@ class _AccountPageState extends State<AccountPage>
 
   @override
   Widget build(BuildContext context) {
-    var dbProvider = Provider.of<DBProvider>(context);
+    var bloc = Provider.of<FirebaseBloc>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.orangeAccent,
         title: const Text('Account'),
         actions: <Widget>[
           IconButton(
-              onPressed: () => _saveNewAccountInfo(_data!, dbProvider),
+              onPressed: () {
+                setState(() {
+                  _isSaving = true;
+                });
+                _saveNewAccountInfo(_data!, bloc);
+              },
               icon: const Icon(Icons.save)),
         ],
       ),
-      body: Form(
-        key: _formKey,
-        canPop: !_hasChanges,
-        onPopInvoked: (bool didPop) {
-          if (didPop) {
-            return;
-          }
-          _showDialog();
-        },
-        onChanged: () => _hasChanges = true,
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            children: <Widget>[
-              IconHolder(
-                //codePoint - свойство типа int для идентификации значка в
-                // файле шрифта
-                tagId:
-                    widget.account == null ? 0 : widget.account!.id as Object,
-                newIcon: IconHelper.createIconData(_data!['codePoint']),
-                onIconChange: (IconData iconData) {
-                  _hasChanges = true;
-                  setState(() {
-                    _data!['codePoint'] = iconData.codePoint;
-                  });
-                },
-              ),
-              //Существует два виджета, которые позволяют захватывать текстовый
-              // ввод: Text Field и TextFormField. Оба наследуются от
-              // StatefulWidget, но TextFormField является производным
-              // непосредственно от класса FormField. Класс FormField добавляет
-              // дополнительные вспомогательные функции, которые при использовании
-              // с виджетом Form упрощают проверку и сохранение данных из
-              // нескольких полей одновременно.
+      body: _isSaving
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : Form(
+              key: _formKey,
+              canPop: !_hasChanges,
+              onPopInvoked: (bool didPop) {
+                if (didPop) {
+                  return;
+                }
+                _showDialog();
+              },
+              onChanged: () => _hasChanges = true,
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  children: <Widget>[
+                    IconHolder(
+                      //codePoint - свойство типа int для идентификации значка в
+                      // файле шрифта
+                      tagUrlId:
+                          widget.account == null ? '0' : widget.account!.urlId,
+                      newIcon: IconHelper.createIconData(_data!['codePoint']),
+                      onIconChange: (IconData iconData) {
+                        _hasChanges = true;
+                        setState(() {
+                          _data!['codePoint'] = iconData.codePoint;
+                        });
+                      },
+                    ),
+                    //Существует два виджета, которые позволяют захватывать текстовый
+                    // ввод: Text Field и TextFormField. Оба наследуются от
+                    // StatefulWidget, но TextFormField является производным
+                    // непосредственно от класса FormField. Класс FormField добавляет
+                    // дополнительные вспомогательные функции, которые при использовании
+                    // с виджетом Form упрощают проверку и сохранение данных из
+                    // нескольких полей одновременно.
 
-              //Цей віджет допомагає анімувати позицію віджета з його початкової
-              // позиції за допомогою зсуву.
-              SlideTransition(
-                position: _animationName,
-                child: TextFormField(
-                  initialValue:
-                      widget.account != null ? widget.account!.name : '',
-                  decoration: const InputDecoration(
-                    labelText: 'Name',
-                  ),
-                  validator: (var value) => _nameValidator(value),
-                  onSaved: (value) => _data?['name'] = value,
+                    //Цей віджет допомагає анімувати позицію віджета з його початкової
+                    // позиції за допомогою зсуву.
+                    SlideTransition(
+                      position: _animationName,
+                      child: TextFormField(
+                        initialValue:
+                            widget.account != null ? widget.account!.name : '',
+                        decoration: const InputDecoration(
+                          labelText: 'Name',
+                        ),
+                        validator: (var value) => _nameValidator(value),
+                        onSaved: (value) => _data?['name'] = value,
+                      ),
+                    ),
+                    SlideTransition(
+                      position: _animationBalance,
+                      child: TextFormField(
+                        initialValue: widget.account != null
+                            ? widget.account!.balance.toString()
+                            : '',
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
+                        decoration: const InputDecoration(
+                          labelText: 'Balance',
+                        ),
+                        validator: (var value) => _balanceValidator(value),
+                        onSaved: (value) =>
+                            _data?['balance'] = double.parse(value!),
+                      ),
+                    )
+                  ],
                 ),
               ),
-              SlideTransition(
-                position: _animationBalance,
-                child: TextFormField(
-                  initialValue: widget.account != null
-                      ? widget.account!.balance.toString()
-                      : '',
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(
-                    labelText: 'Balance',
-                  ),
-                  validator: (var value) => _balanceValidator(value),
-                  onSaved: (value) => _data?['balance'] = double.parse(value!),
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 
@@ -218,7 +232,7 @@ class _AccountPageState extends State<AccountPage>
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
     var account = Account.fromMap(data);
-    if (account.id == null) {
+    if (account.urlId == null) {
       await dbProvider.createAccount(account);
     } else {
       await dbProvider.updateAccount(account);
