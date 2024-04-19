@@ -77,13 +77,4 @@ class Apis {
       throw Exception('Error: ${response.statusCode} ${response.body}');
     }
   }
-
-// Map<String, String> _createHeader() {
-//   var header = {
-//       "authorasation": "Bearer $_securityToken",
-//       //"authorasation": url,
-//       "Content-Type": "application/json"
-//     };
-//   return header;
-// }
 }
