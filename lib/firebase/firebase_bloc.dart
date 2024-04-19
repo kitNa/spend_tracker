@@ -20,17 +20,16 @@ class FirebaseBloc {
   //Різниця між Поведінковим суб'єктом і Суб'єктом публікації для наших цілей
   // полягає в тому, що Суб'єкт Публікації не запам'ятовує останнє значення,
   // а Суб'єкт поведінки запам'ятовує.
-  final BehaviorSubject<List<Account>> _accountsBehavSub =
-      BehaviorSubject<List<Account>>();
+  final BehaviorSubject<List<Account>?> _accountsBehavSub = BehaviorSubject<List<Account>?>();
 
   //Observable для використання інтерфейсом користувача.
   //Observable<bool>
-  get loginStatus {
+  Stream<bool> get loginStatus {
     return _securityPubSub.stream;
   }
 
   //потрібно відкрити потік з властивістю getter.
-  get accounts {
+  Stream<List<Account>?> get accounts {
     return _accountsBehavSub.stream;
   }
 
@@ -46,7 +45,7 @@ class FirebaseBloc {
   Future createAccount(Account account) async {
     try {
       await apis.createAccount(account);
-      //_accountsBehavSub.sink.add(null);
+      _accountsBehavSub.sink.add(null);
       await getAccounts();
     } catch (err) {
       _accountsBehavSub.sink.addError(err.toString());
@@ -56,7 +55,7 @@ class FirebaseBloc {
   Future updateAccount(Account account) async {
     try {
       await apis.createAccount(account);
-      //_accountsBehavSub.sink.add(null);
+      _accountsBehavSub.sink.add(null);
       await getAccounts();
     } catch (err) {
       _accountsBehavSub.sink.addError(err.toString());

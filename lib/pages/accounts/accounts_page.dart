@@ -49,10 +49,10 @@ class _AccountsPageState extends State<AccountsPage> {
         // у потоці та перебудовує своє дерево віджетів щоразу, коли
         // відбуваються зміни. Якщо подивитися на сигнатуру конструктора
         // StreamBuilder, то він виглядає практично ідентично FutureBuilder.
-        body: StreamBuilder<List<Account>>(
+        body: StreamBuilder<List<Account>?>(
           stream: bloc.accounts,
           //AsyncSnapshot помогает обрабатывать данные асинхронного вызова
-          builder: (_, AsyncSnapshot<List<Account>> snapshot) {
+          builder: (_, AsyncSnapshot<List<Account>?> snapshot) {
             if (!snapshot.hasData) {
               return const Center(
                 child: CircularProgressIndicator(),
