@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:spend_tracker/database/db_provider.dart';
+import '../../firebase/firebase_bloc.dart';
+
 
 import '../../models/item.dart';
 
@@ -10,15 +11,14 @@ class ItemsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var dbProvider = Provider.of<DBProvider>(context, listen: false);
+    var bloc = Provider.of<FirebaseBloc>(context);
     return Scaffold(
         appBar: AppBar(
           title: const Text('Items'),
           backgroundColor: Colors.orangeAccent,
         ),
-        body: FutureBuilder<List<Item>>(
-          //метод getAllAccounts вызывается каждый раз при вызове метода сборки.
-          future: dbProvider.getAllItems(),
+        body: StreamBuilder<List<Item>>(
+          stream: bloc.items,
           //AsyncSnapshot помогает обрабатывать данные асинхронного вызова
           builder: (_, AsyncSnapshot<List<Item>> snapshot) {
             if (!snapshot.hasData) {
@@ -63,7 +63,7 @@ class ItemsPage extends StatelessWidget {
                 // перпендикулярно направлению отклонения) до нуля в течение
                 // resizeDuration .
                 return Dismissible(
-                  key: ObjectKey(item.id),
+                  key: ObjectKey(item.urlId),
                   // Cвойству ConfirmDismiss требуется функция,
                   // которая возвращает Future с логическим
                   // значением в качестве значения. Он передает объект
@@ -72,7 +72,7 @@ class ItemsPage extends StatelessWidget {
                   confirmDismiss: (DismissDirection direction) async {
                     //пролистывание справа налево.
                     if (direction == DismissDirection.endToStart) {
-                      await dbProvider.deleteItem(item);
+                      await bloc.deleteItem(item);
                       return true;
                     }
                     return false;

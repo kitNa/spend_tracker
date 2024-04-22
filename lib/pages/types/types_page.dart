@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:spend_tracker/firebase/firebase_bloc.dart';
 import 'package:spend_tracker/models/item_type.dart';
 import 'package:spend_tracker/database/db_provider.dart';
 import 'type_page.dart';
@@ -9,7 +10,7 @@ class TypesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var dbProvider = Provider.of<DBProvider>(context, listen: false);
+    var bloc = Provider.of<FirebaseBloc>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -25,8 +26,8 @@ class TypesPage extends StatelessWidget {
           )
         ],
       ),
-      body: FutureBuilder<List<ItemType>>(
-        future: dbProvider.getTypes(),
+      body: StreamBuilder<List<ItemType>>(
+        stream: bloc.itemTypes,
         builder: (_, AsyncSnapshot<List<ItemType>> snapshot) {
           if (!snapshot.hasData) {
             return const Center(
@@ -68,7 +69,7 @@ class TypesPage extends StatelessWidget {
                 // commonly known as shared element transitions or shared
                 // element animations.
                 leading: Hero(
-                    tag: type.id as Object,
+                    tag: type.urlId as Object,
                     child: Icon(type.iconData)),
                 title: Text(type.name),
                onTap: () {

@@ -63,7 +63,6 @@ class _AccountsPageState extends State<AccountsPage> {
                 child: Text(snapshot.error.toString()),
               );
             }
-
             //FutureBuilder возвращает список, поэтому  snapshot
             // будет содержать список учетных записей.
             var accounts = snapshot.data;

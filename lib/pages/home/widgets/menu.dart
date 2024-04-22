@@ -52,7 +52,10 @@ class Menu extends StatelessWidget {
                 color: color,
                 title: 'Budget Items',
                 icon: Icons.attach_money,
-                onTap: () => onNavigation(context, '/items'),
+                onTap: () {
+                  bloc.getItems();
+                  onNavigation(context, '/items');
+                },
               ),
               const Divider(
                 height: 20,
@@ -62,7 +65,10 @@ class Menu extends StatelessWidget {
                 color: color,
                 title: 'Types',
                 icon: Icons.widgets,
-                onTap: () => onNavigation(context, '/types'),
+                onTap: () {
+                  bloc.getTypes();
+                  onNavigation(context, '/types');
+                }
               ),
               const Divider(
                 height: 20,
@@ -72,7 +78,10 @@ class Menu extends StatelessWidget {
                 color: color,
                 title: 'Bar Chart',
                 icon: Icons.bar_chart,
-                onTap: () => onNavigation(context, '/bar_chart'),
+                onTap: () {
+                  bloc.balance;
+                  onNavigation(context, '/bar_chart');
+                },
               ),
               const Divider(
                 height: 20,
