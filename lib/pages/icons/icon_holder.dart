@@ -4,16 +4,18 @@ import 'icons_page.dart';
 typedef OnIconChange = void Function(IconData iconData);
 
 class IconHolder extends StatefulWidget {
-  const IconHolder ({
+  const IconHolder({
     super.key,
+    this.tagId,
+    this.tagUrlId,
     required this.newIcon,
     required this.onIconChange,
-    required this.tagId,
   });
 
   final IconData newIcon;
   final OnIconChange onIconChange;
-  final Object tagId;
+  final int? tagId;
+  final String? tagUrlId;
 
   @override
   State<IconHolder> createState() => _IconHolderState();
@@ -42,7 +44,7 @@ class _IconHolderState extends State<IconHolder> {
         // commonly known as shared element transitions or shared
         // element animations.
         child: Hero(
-          tag: widget.tagId,
+          tag: widget.tagId == null? widget.tagUrlId as Object : widget.tagId as Object,
           child: Icon(
             widget.newIcon,
             size: 60,
@@ -56,9 +58,9 @@ class _IconHolderState extends State<IconHolder> {
   void _pickAvatar() async {
     var iconData = await Navigator.push(
       context,
-        MaterialPageRoute(
-          builder: (context) => const IconsPage(),
-        ),
+      MaterialPageRoute(
+        builder: (context) => const IconsPage(),
+      ),
     );
     widget.onIconChange(iconData);
   }

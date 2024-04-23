@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:spend_tracker/firebase/firebase_bloc.dart';
 import 'account_page.dart';
 
 //Библиотека провайдера позволит нам получить класс dbProvider.
@@ -21,7 +22,7 @@ class AccountsPage extends StatefulWidget {
 class _AccountsPageState extends State<AccountsPage> {
   @override
   Widget build(BuildContext context) {
-    var dbProvider = Provider.of<DBProvider>(context);
+    var bloc = Provider.of<FirebaseBloc>(context);
 
     return Scaffold(
         appBar: AppBar(
@@ -44,11 +45,14 @@ class _AccountsPageState extends State<AccountsPage> {
         // каждый раз при создании виджета. Помните, что это StatelessWidget,
         // поэтому всякий раз, когда фреймворк обнаруживает изменение, виджет
         // создается заново и вызывается метод сборки.
-        body: FutureBuilder<List<Account>>(
-          //метод getAllAccounts вызывается каждый раз при вызове метода сборки.
-          future: dbProvider.getAccounts(),
+        // StreamBuilder дуже схожий на FutureBuilder. Він прислухається до змін
+        // у потоці та перебудовує своє дерево віджетів щоразу, коли
+        // відбуваються зміни. Якщо подивитися на сигнатуру конструктора
+        // StreamBuilder, то він виглядає практично ідентично FutureBuilder.
+        body: StreamBuilder<List<Account>?>(
+          stream: bloc.accounts,
           //AsyncSnapshot помогает обрабатывать данные асинхронного вызова
-          builder: (_, AsyncSnapshot<List<Account>> snapshot) {
+          builder: (_, AsyncSnapshot<List<Account>?> snapshot) {
             if (!snapshot.hasData) {
               return const Center(
                 child: CircularProgressIndicator(),
@@ -59,7 +63,6 @@ class _AccountsPageState extends State<AccountsPage> {
                 child: Text(snapshot.error.toString()),
               );
             }
-
             //FutureBuilder возвращает список, поэтому  snapshot
             // будет содержать список учетных записей.
             var accounts = snapshot.data;
@@ -92,7 +95,7 @@ class _AccountsPageState extends State<AccountsPage> {
                   // commonly known as shared element transitions or shared
                   // element animations.
                   leading: Hero(
-                      tag: account.id as Object,
+                      tag: account.urlId as Object,
                       child: Icon(account.iconData)),
                   title: Text(account.name),
                   trailing: Text('\$${formatter.format(account.balance)}'),

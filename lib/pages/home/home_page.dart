@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:spend_tracker/database/db_provider.dart';
+import 'package:spend_tracker/firebase/firebase_bloc.dart';
 import 'package:spend_tracker/pages/home/widgets/menu.dart';
 import 'package:spend_tracker/pages/index.dart';
 import 'package:spend_tracker/routes.dart';
@@ -39,7 +40,7 @@ class _HomePageState extends State<
         AnimationController(vsync: this, duration: const Duration(seconds: 2));
     _animation = Tween<double>(
       begin: 0,
-      end: 400,
+      end: 360,
     ).animate(_controller)
       //дві крапки - це каскадна нотація в Dart. Це дозволяє нам робити послідовні
       //виклики методів на одному і тому ж об'єкті. Можна об'єднати стільки
@@ -83,10 +84,9 @@ class _HomePageState extends State<
     // context.read<T>() is same as Provider.of<T>(context, listen: false)
     // context.watch<T>() is same as Provider.of<T>(context)```
     // more info in item_page
-    var dbProvider = context.watch<DBProvider>();
-    var balance = await dbProvider.getBalance();
+    var block = Provider.of<FirebaseBloc>(context);
     setState(() {
-      _balance = balance.total;
+      _balance = block.balance.total;
       routeObserver.subscribe(this, ModalRoute.of(context) as PageRoute);
       WidgetsBinding.instance.addObserver(this);
       _opacity = 1.0;
@@ -114,23 +114,35 @@ class _HomePageState extends State<
   //екран зі стека, щоб бути точнішим.
   @override
   void didPopNext() async {
-    var dbProvider = context.watch<DBProvider>();
-    var balance = await dbProvider.getBalance();
-    _balance = balance.total;
+    // var dbProvider = context.read<DBProvider>();
+    // var balance = await dbProvider.getBalance();
+    // _balance = balance.total;
+    var block = Provider.of<FirebaseBloc>(context);
+    setState(() {
+      _balance = block.balance.total;
+    });
     print('home_page did pop next');
   }
 
   //didPushNext викликається, коли ми переходимо на інший екран.
   @override
   void didPushNext() async {
-    var dbProvider = context.watch<DBProvider>();
-    var balance = await dbProvider.getBalance();
-    _balance = balance.total;
+    // var dbProvider = context.read<DBProvider>();
+    // var balance = await dbProvider.getBalance();
+    // _balance = balance.total;
+    var block = Provider.of<FirebaseBloc>(context);
+    setState(() {
+      _balance = block.balance.total;
+    });
     print('home_page did push next');
   }
 
   @override
   Widget build(BuildContext context) {
+    var bloc = Provider.of<FirebaseBloc>(context);
+    bloc.getItems();
+    _balance = bloc.balance.total;
+
     return Scaffold(
       floatingActionButton: PopupMenuButton(
         child: const Icon(

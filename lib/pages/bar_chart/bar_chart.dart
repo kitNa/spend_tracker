@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:spend_tracker/routes.dart';
+import 'package:spend_tracker/firebase/firebase_bloc.dart';
+//import 'package:spend_tracker/routes.dart';
 
 import '../../database/db_provider.dart';
 import '../../models/balance.dart';
@@ -44,7 +45,7 @@ class _BarChartPageState extends State<
   @override
   void dispose() {
     super.dispose();
-    _controller?.dispose();
+    _controller.dispose();
   }
 
   @override
@@ -58,13 +59,14 @@ class _BarChartPageState extends State<
     super.didChangeDependencies();
     // context.read<T>() is same as Provider.of<T>(context, listen: false)
     // context.watch<T>() is same as Provider.of<T>(context)```
-    // more info in item_page
-    var dbProvider = context.watch<DBProvider>();
-    var balance = await dbProvider.getBalance();
-    _setHeightBalances(balance);
+    // more info in item_pageF
+    _setHeightBalances();
   }
 
-  void _setHeightBalances(Balance balance) {
+  void _setHeightBalances() {
+    var bloc = Provider.of<FirebaseBloc>(context);
+    Balance balance = bloc.balance;
+
     var headersFootersHeight = 284;
     var maxAmount =
         balance.withdraw > balance.deposit ? balance.withdraw : balance.deposit;
@@ -103,7 +105,7 @@ class _BarChartPageState extends State<
           Container(
             height: 40,
           ),
-          Container(
+           Container(
             height: MediaQuery.of(context).size.height - 196,
             child: Row(
               //положення початку віджета по вертикалі
