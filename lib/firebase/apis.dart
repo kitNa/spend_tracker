@@ -121,7 +121,8 @@ class Apis {
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Login failed');
+      print('Login failed: code=${response.statusCode}, body=${response.body}');
+      throw Exception('Login failed: code =${response.statusCode}');
     }
 
     _checkStatus(response);

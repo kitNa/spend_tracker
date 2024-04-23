@@ -118,7 +118,9 @@ class _HomePageState extends State<
     // var balance = await dbProvider.getBalance();
     // _balance = balance.total;
     var block = Provider.of<FirebaseBloc>(context);
-    _balance = block.balance.total;
+    setState(() {
+      _balance = block.balance.total;
+    });
     print('home_page did pop next');
   }
 
@@ -129,12 +131,18 @@ class _HomePageState extends State<
     // var balance = await dbProvider.getBalance();
     // _balance = balance.total;
     var block = Provider.of<FirebaseBloc>(context);
-    _balance = block.balance.total;
+    setState(() {
+      _balance = block.balance.total;
+    });
     print('home_page did push next');
   }
 
   @override
   Widget build(BuildContext context) {
+    var bloc = Provider.of<FirebaseBloc>(context);
+    bloc.getItems();
+    _balance = bloc.balance.total;
+
     return Scaffold(
       floatingActionButton: PopupMenuButton(
         child: const Icon(
